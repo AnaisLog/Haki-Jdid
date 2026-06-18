@@ -38,6 +38,16 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
+// Validate lesson/category exists
+function findLesson(id, source) {
+  if (source === "arabic") {
+    return ARABIC_LESSONS.find(l => l.id === id) || null;
+  } else if (source === "nursing") {
+    return NURSING_DATA.categories.find(c => c.id === id) || null;
+  }
+  return null;
+}
+
 // ---------------- ROUTER ----------------
 function navigate(hash) {
   location.hash = hash;
@@ -89,15 +99,36 @@ function renderApp() {
   const view = document.getElementById("view");
 
   if (route[0] === "home") renderHome(view);
-  else if (route[0] === "arabic" && route[1]) renderLesson(view, route[1], "arabic");
+  else if (route[0] === "arabic" && route[1]) {
+    const lesson = findLesson(route[1], "arabic");
+    if (lesson) renderLesson(view, route[1], "arabic");
+    else render404(view, "Cours introuvable");
+  }
   else if (route[0] === "arabic") renderLessonList(view, "arabic");
-  else if (route[0] === "nursing" && route[1]) renderLesson(view, route[1], "nursing");
+  else if (route[0] === "nursing" && route[1]) {
+    const category = findLesson(route[1], "nursing");
+    if (category) renderLesson(view, route[1], "nursing");
+    else render404(view, "Fiche introuvable");
+  }
   else if (route[0] === "nursing") renderLessonList(view, "nursing");
   else if (route[0] === "quiz") renderQuizHome(view, route[1]);
-  else renderHome(view);
+  else render404(view, "Page introuvable");
 }
 
 window.addEventListener("hashchange", renderApp);
+
+// ---------------- 404 PAGE ----------------
+function render404(view, message = "Page introuvable") {
+  view.innerHTML = `
+    <div class="error-state">
+      <div class="ic">🔍</div>
+      <h2>Erreur 404</h2>
+      <p>${escapeHtml(message)}</p>
+      <button class="btn" id="back-to-home">Retour à l'accueil</button>
+    </div>
+  `;
+  document.getElementById("back-to-home").addEventListener("click", () => navigate("/home"));
+}
 
 // ---------------- HOME ----------------
 function renderHome(view) {
@@ -174,12 +205,10 @@ function renderLessonList(view, source) {
 
 // ---------------- LESSON DETAIL ----------------
 function renderLesson(view, id, source) {
-  const lesson = source === "arabic"
-    ? ARABIC_LESSONS.find(l => l.id === id)
-    : NURSING_DATA.categories.find(c => c.id === id);
+  const lesson = findLesson(id, source);
 
   if (!lesson) {
-    view.innerHTML = `<div class="empty-state"><div class="ic">🤔</div><p>Leçon introuvable.</p></div>`;
+    render404(view, source === "arabic" ? "Cours introuvable" : "Fiche introuvable");
     return;
   }
 
@@ -227,7 +256,8 @@ function renderLesson(view, id, source) {
     audioBox.innerHTML = `🎧 <audio controls preload="none" src="${audioFile}"></audio>`;
   });
   testAudio.addEventListener("error", () => {
-    audioBox.innerHTML = `<span class="audio-missing">🎧 Pas encore de fichier audio pour ce cours. Dépose un fichier nommé <code>${lesson.id}.mp3</code> dans le dossier <code>/audio/</code> sur GitHub pour qu'il apparaisse ici.</span>`;
+    const audioName = source === "arabic" ? `sheet${lesson.num}.mp3` : `${lesson.id}.mp3`;
+    audioBox.innerHTML = `<span class="audio-missing">🎧 Pas encore de fichier audio pour ce cours. Dépose un fichier nommé <code>${escapeHtml(audioName)}</code> dans le dossier <code>/audio/</code> du dépôt.</span>`;
   });
   testAudio.src = audioFile;
 

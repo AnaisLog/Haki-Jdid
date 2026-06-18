@@ -1,0 +1,339 @@
+/* ===========================================================
+   حكي جديد — Apprentissage de l'arabe jordanien
+   Design : hospitalité levantine, café & lignes géométriques
+   =========================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Karla:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@500;700&family=IBM+Plex+Mono:ital,wght@0,400;1,400&display=swap');
+
+:root{
+  /* Couleurs */
+  --bg:            #EFF1E8;
+  --bg-soft:       #E6E9DD;
+  --card:          #FFFCF6;
+  --ink:           #1F2E29;
+  --ink-soft:      #5B6A62;
+  --line:          #D8D9C9;
+
+  --primary:       #1C5C53;
+  --primary-dark:  #123F39;
+  --primary-light: #2E8074;
+  --primary-tint:  #DDEAE6;
+
+  --gold:          #D7943C;
+  --gold-tint:     #F6E7CC;
+
+  --clay:          #B8503A;
+  --clay-tint:     #F3DCD3;
+
+  --correct:       #4F8F5B;
+  --correct-tint:  #DEEEDF;
+
+  /* Typo */
+  --f-display: 'Fraunces', serif;
+  --f-body: 'Karla', sans-serif;
+  --f-arabic: 'Noto Naskh Arabic', serif;
+  --f-mono: 'IBM Plex Mono', monospace;
+
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 14px rgba(31,46,41,0.08);
+  --shadow-lift: 0 8px 24px rgba(31,46,41,0.14);
+}
+
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; }
+
+body{
+  margin:0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a{ color: inherit; }
+
+h1, h2, h3, .display{
+  font-family: var(--f-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--primary-dark);
+  margin: 0;
+}
+
+button{ font-family: var(--f-body); cursor: pointer; }
+
+:focus-visible{
+  outline: 3px solid var(--gold);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* ---------- Motif géométrique signature (SVG inline réutilisé) ---------- */
+.lattice-divider{
+  width: 100%;
+  height: 18px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='18' viewBox='0 0 36 18'%3E%3Cg fill='none' stroke='%231C5C53' stroke-width='1' opacity='0.35'%3E%3Cpath d='M0 9 L9 0 L18 9 L9 18 Z'/%3E%3Cpath d='M18 9 L27 0 L36 9 L27 18 Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  opacity: 0.8;
+}
+
+/* ===================== APP SHELL ===================== */
+#app{ min-height: 100vh; display:flex; flex-direction: column; }
+
+.topbar{
+  position: sticky; top:0; z-index: 20;
+  background: var(--primary);
+  color: #fff;
+  display:flex; align-items:center; justify-content: space-between;
+  padding: 0.85rem 1.4rem;
+  box-shadow: var(--shadow);
+}
+.topbar .brand{
+  display:flex; align-items:center; gap:0.6rem;
+  font-family: var(--f-display); font-weight:700; font-size:1.25rem;
+  color:#fff; text-decoration:none;
+}
+.topbar .brand .ar{ font-family: var(--f-arabic); font-size:1.4rem; }
+.topbar nav{ display:flex; gap: 0.4rem; }
+.topbar nav button{
+  background: transparent; border:none; color: rgba(255,255,255,0.82);
+  font-weight:600; font-size:0.92rem; padding:0.5rem 0.9rem; border-radius: 999px;
+  transition: background 0.15s, color 0.15s;
+}
+.topbar nav button:hover{ background: rgba(255,255,255,0.12); color:#fff; }
+.topbar nav button.active{ background:#fff; color: var(--primary-dark); }
+.topbar .logout{
+  background: transparent; border: 1px solid rgba(255,255,255,0.35); color: rgba(255,255,255,0.85);
+  font-size:0.8rem; padding: 0.4rem 0.8rem; border-radius: 999px;
+}
+.topbar .logout:hover{ background: rgba(255,255,255,0.12); }
+
+main.view{
+  flex:1; width:100%; max-width: 980px; margin: 0 auto;
+  padding: 1.8rem 1.2rem 6rem;
+}
+
+/* Bottom tab bar — mobile only */
+.tabbar{
+  display:none;
+  position: fixed; bottom:0; left:0; right:0; z-index: 30;
+  background: var(--card); border-top: 1px solid var(--line);
+  box-shadow: 0 -4px 16px rgba(31,46,41,0.10);
+}
+.tabbar button{
+  flex:1; background:none; border:none; padding: 0.55rem 0 0.7rem;
+  display:flex; flex-direction:column; align-items:center; gap:0.15rem;
+  color: var(--ink-soft); font-size: 0.68rem; font-weight:600;
+}
+.tabbar button .ic{ font-size: 1.25rem; }
+.tabbar button.active{ color: var(--primary); }
+
+@media (max-width: 720px){
+  .topbar nav{ display:none; }
+  .tabbar{ display:flex; }
+  main.view{ padding-bottom: 6.5rem; }
+}
+
+/* ===================== LOGIN ===================== */
+.login-screen{
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  background: linear-gradient(180deg, var(--bg-soft), var(--bg));
+  padding: 1.5rem;
+}
+.login-card{
+  background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow-lift);
+  width: 100%; max-width: 380px; padding: 2.2rem 1.9rem 1.9rem; text-align:center;
+}
+.login-card .ar-mark{ font-family: var(--f-arabic); font-size: 2.6rem; color: var(--primary); display:block; margin-bottom: 0.3rem; }
+.login-card h1{ font-size: 1.5rem; margin-bottom: 0.35rem; }
+.login-card p.sub{ color: var(--ink-soft); font-size: 0.92rem; margin-bottom: 1.4rem; }
+.login-card input[type="password"]{
+  width:100%; padding: 0.75rem 1rem; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--line); font-size: 1rem; margin-bottom: 0.8rem; text-align:center;
+  background: var(--bg);
+}
+.login-card input:focus{ border-color: var(--primary); outline:none; }
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:0.4rem;
+  background: var(--primary); color:#fff; border:none; border-radius: 999px;
+  padding: 0.75rem 1.5rem; font-weight:700; font-size:0.96rem;
+  transition: transform 0.12s, background 0.15s;
+  width:100%;
+}
+.btn:hover{ background: var(--primary-light); }
+.btn:active{ transform: scale(0.98); }
+.btn.btn-gold{ background: var(--gold); color: var(--primary-dark); }
+.btn.btn-gold:hover{ background:#c9842c; }
+.btn.btn-outline{ background: transparent; border: 1.5px solid var(--primary); color: var(--primary); }
+.btn.btn-outline:hover{ background: var(--primary-tint); }
+.btn.btn-small{ padding: 0.5rem 1rem; font-size: 0.85rem; width:auto; }
+
+.login-error{ color: var(--clay); font-size: 0.86rem; margin: -0.4rem 0 0.8rem; min-height: 1.1em; font-weight:600; }
+
+/* ===================== HOME ===================== */
+.hero{
+  background: var(--primary); color:#fff; border-radius: var(--radius);
+  padding: 1.8rem 1.6rem; margin-bottom: 1.6rem; position:relative; overflow:hidden;
+}
+.hero h1{ color:#fff; font-size: 1.65rem; margin-bottom:0.3rem; }
+.hero p{ color: rgba(255,255,255,0.85); margin:0 0 1rem; max-width: 32em; }
+.hero .progress-row{ display:flex; gap:1.6rem; flex-wrap:wrap; margin-top:0.6rem; }
+.stat{ }
+.stat .num{ font-family: var(--f-display); font-size: 1.9rem; font-weight:700; color: var(--gold); line-height:1; }
+.stat .lab{ font-size: 0.78rem; color: rgba(255,255,255,0.78); text-transform:uppercase; letter-spacing:0.04em; }
+
+.section-title{ display:flex; align-items:baseline; justify-content:space-between; margin: 1.8rem 0 0.9rem; }
+.section-title h2{ font-size:1.25rem; }
+.section-title .count{ color: var(--ink-soft); font-size:0.88rem; }
+
+.card-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(230px,1fr)); gap: 0.9rem; }
+
+.lesson-card{
+  background: var(--card); border-radius: var(--radius); padding: 1.1rem 1.2rem;
+  box-shadow: var(--shadow); border:1px solid var(--line); text-align:left;
+  display:flex; flex-direction:column; gap:0.5rem; transition: transform 0.12s, box-shadow 0.12s;
+}
+.lesson-card:hover{ transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+.lesson-card .top-row{ display:flex; justify-content:space-between; align-items:flex-start; }
+.lesson-card .badge-num{
+  background: var(--primary-tint); color: var(--primary-dark); font-weight:700;
+  font-size:0.78rem; padding:0.2rem 0.55rem; border-radius:999px;
+}
+.lesson-card h3{ font-size: 1.05rem; color: var(--ink); line-height:1.3; }
+.lesson-card .meta{ font-size: 0.8rem; color: var(--ink-soft); }
+.lesson-card .progress-bar{ height:6px; background: var(--bg-soft); border-radius:999px; overflow:hidden; margin-top:0.2rem; }
+.lesson-card .progress-bar > div{ height:100%; background: var(--correct); border-radius:999px; }
+
+.cta-revise{
+  margin-top: 2.2rem; background: var(--gold-tint); border: 1.5px dashed var(--gold);
+  border-radius: var(--radius); padding: 1.3rem 1.4rem; display:flex; align-items:center;
+  justify-content:space-between; gap:1rem; flex-wrap:wrap;
+}
+.cta-revise h3{ font-size:1.05rem; margin-bottom:0.2rem; }
+.cta-revise p{ color: var(--ink-soft); font-size:0.88rem; margin:0; }
+
+/* ===================== LESSON VIEW ===================== */
+.lesson-header{ margin-bottom: 1.2rem; }
+.back-link{ background:none; border:none; color: var(--primary); font-weight:700; font-size:0.88rem; padding:0; margin-bottom:0.7rem; display:inline-flex; align-items:center; gap:0.3rem; }
+.lesson-header h1{ font-size: 1.5rem; }
+.lesson-header .meta{ color: var(--ink-soft); font-size:0.88rem; margin-top:0.2rem; }
+
+.audio-box{
+  background: var(--card); border:1px solid var(--line); border-radius: var(--radius);
+  padding: 1rem 1.2rem; margin: 1.1rem 0 1.5rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
+}
+.audio-box audio{ flex:1; min-width:220px; }
+.audio-box .audio-missing{ color: var(--ink-soft); font-size:0.88rem; }
+.audio-box .audio-missing code{ background: var(--bg-soft); padding:0.1rem 0.4rem; border-radius:4px; }
+
+.disclaimer-box{
+  background: var(--clay-tint); border-left:4px solid var(--clay); border-radius: var(--radius-sm);
+  padding: 0.9rem 1.1rem; margin-bottom:1.4rem; font-size: 0.86rem; color: var(--ink);
+}
+.disclaimer-box strong{ color: var(--clay); }
+
+.word-list{ display:flex; flex-direction:column; gap:0.7rem; }
+
+.word-card{
+  background: var(--card); border:1px solid var(--line); border-radius: var(--radius);
+  padding: 1rem 1.2rem; display:flex; align-items:center; gap:1rem; cursor:pointer;
+  transition: box-shadow 0.12s;
+}
+.word-card:hover{ box-shadow: var(--shadow); }
+.word-card .num{ font-family: var(--f-mono); color: var(--ink-soft); font-size:0.8rem; width:1.6em; flex-shrink:0; }
+.word-card .content{ flex:1; min-width:0; }
+.word-card .arabic{ font-family: var(--f-arabic); font-size: 1.5rem; color: var(--primary-dark); direction: rtl; }
+.word-card .phonetic{ font-family: var(--f-mono); font-style:italic; color: var(--ink-soft); font-size:0.86rem; margin-top:0.15rem; }
+.word-card .french{ display:none; font-size:0.96rem; margin-top:0.3rem; color: var(--ink); }
+.word-card.flipped .french{ display:block; }
+.word-card.flipped .phonetic{ }
+.word-card .tag-pill{ display:inline-block; background: var(--primary-tint); color:var(--primary-dark); font-size:0.7rem; font-weight:700; padding:0.1rem 0.5rem; border-radius:999px; margin-bottom:0.3rem; }
+.word-card .incomplete-pill{ display:inline-block; background: var(--clay-tint); color: var(--clay); font-size:0.7rem; font-weight:700; padding:0.1rem 0.5rem; border-radius:999px; }
+.word-card .track-btns{ display:flex; flex-direction:column; gap:0.3rem; flex-shrink:0; }
+.word-card .track-btns button{
+  border:none; background: var(--bg-soft); border-radius:8px; padding:0.3rem 0.4rem; font-size:0.95rem; line-height:1;
+}
+.word-card .track-btns button.known{ background: var(--correct-tint); }
+.word-card .track-btns button.known.active{ background: var(--correct); color:#fff; }
+.word-card .track-btns button.unknown.active{ background: var(--clay); color:#fff; }
+.word-card .extra-notes{ display:none; margin-top:0.6rem; padding-top:0.6rem; border-top:1px dashed var(--line); font-size:0.82rem; color: var(--ink-soft); white-space:pre-line; }
+.word-card.flipped .extra-notes{ display:block; }
+
+.bonus-section{ margin-top:1.8rem; }
+.bonus-section h3{ font-size:1.05rem; margin-bottom:0.6rem; }
+.bonus-grid{ display:grid; grid-template-columns: repeat(auto-fill,minmax(180px,1fr)); gap:0.6rem; }
+.bonus-card{ background: var(--bg-soft); border-radius: var(--radius-sm); padding:0.7rem 0.9rem; }
+.bonus-card .phonetic{ font-family: var(--f-mono); font-style:italic; font-size:0.85rem; color: var(--primary-dark); }
+.bonus-card .french{ font-size:0.86rem; color: var(--ink-soft); }
+
+/* ===================== QUIZ ===================== */
+.quiz-intro{ text-align:center; padding: 1rem 0 2rem; }
+.quiz-intro h1{ font-size:1.5rem; margin-bottom:0.4rem; }
+.quiz-intro p{ color: var(--ink-soft); max-width: 34em; margin: 0 auto 1.6rem; }
+.mode-grid{ display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:1rem; margin-top:1rem; }
+.mode-card{
+  background: var(--card); border:1.5px solid var(--line); border-radius: var(--radius);
+  padding: 1.3rem 1.2rem; text-align:left; transition: transform 0.12s, border-color 0.12s;
+}
+.mode-card:hover{ transform: translateY(-3px); border-color: var(--primary); }
+.mode-card .ic{ font-size:1.6rem; }
+.mode-card h3{ font-size:1.05rem; margin:0.5rem 0 0.3rem; }
+.mode-card p{ font-size:0.85rem; color: var(--ink-soft); margin:0; }
+
+.scope-row{ display:flex; gap:0.6rem; justify-content:center; flex-wrap:wrap; margin-bottom:1.2rem; }
+.scope-row button{
+  background: var(--card); border:1.5px solid var(--line); border-radius:999px; padding:0.45rem 1rem; font-size:0.85rem; font-weight:600; color: var(--ink-soft);
+}
+.scope-row button.active{ background: var(--primary); border-color: var(--primary); color:#fff; }
+
+.quiz-runner{ max-width: 560px; margin: 0 auto; }
+.quiz-progress{ display:flex; align-items:center; gap:0.8rem; margin-bottom:1.4rem; }
+.quiz-progress .bar{ flex:1; height:8px; background: var(--bg-soft); border-radius:999px; overflow:hidden; }
+.quiz-progress .bar > div{ height:100%; background: var(--gold); }
+.quiz-progress .count{ font-size:0.82rem; color: var(--ink-soft); font-weight:600; white-space:nowrap; }
+
+.quiz-card{
+  background: var(--card); border:1px solid var(--line); border-radius: var(--radius);
+  padding: 2rem 1.6rem; text-align:center; box-shadow: var(--shadow); min-height: 230px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.6rem;
+}
+.quiz-card .arabic-big{ font-family: var(--f-arabic); font-size: 2.4rem; color: var(--primary-dark); direction:rtl; }
+.quiz-card .phonetic-big{ font-family: var(--f-mono); font-style:italic; color: var(--ink-soft); font-size:1rem; }
+.quiz-card .prompt-fr{ font-size:1.3rem; font-weight:600; color: var(--ink); }
+.quiz-card .helper{ font-size:0.78rem; text-transform:uppercase; letter-spacing:0.05em; color: var(--ink-soft); margin-bottom:0.3rem; }
+
+.flashcard-flip-hint{ font-size:0.82rem; color: var(--ink-soft); margin-top:0.6rem; }
+
+.qcm-options{ display:grid; gap:0.6rem; margin-top:1.4rem; }
+.qcm-options button{
+  background: var(--card); border:1.5px solid var(--line); border-radius: var(--radius-sm);
+  padding:0.85rem 1rem; text-align:left; font-size:0.98rem; font-weight:600; color: var(--ink);
+}
+.qcm-options button:hover{ border-color: var(--primary); }
+.qcm-options button.correct{ background: var(--correct-tint); border-color: var(--correct); color: #214d2a; }
+.qcm-options button.wrong{ background: var(--clay-tint); border-color: var(--clay); color: #6b2d1f; }
+
+.flash-actions{ display:flex; gap:0.8rem; margin-top:1.4rem; justify-content:center; }
+.flash-actions button{ min-width:140px; }
+
+.quiz-result{ text-align:center; padding: 2rem 1rem; }
+.quiz-result .score-big{ font-family: var(--f-display); font-size: 3rem; color: var(--primary); font-weight:700; }
+.quiz-result p{ color: var(--ink-soft); }
+.quiz-result .actions{ display:flex; gap:0.8rem; justify-content:center; margin-top:1.4rem; flex-wrap:wrap; }
+.quiz-result .actions .btn{ width:auto; }
+
+.empty-state{ text-align:center; padding: 3rem 1rem; color: var(--ink-soft); }
+.empty-state .ic{ font-size:2.2rem; margin-bottom:0.6rem; }
+
+footer.app-footer{ text-align:center; color: var(--ink-soft); font-size:0.78rem; padding: 1.2rem; }
+
+@media (max-width: 480px){
+  .word-card .arabic{ font-size:1.3rem; }
+  .quiz-card .arabic-big{ font-size:1.9rem; }
+}
